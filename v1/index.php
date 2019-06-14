@@ -1,7 +1,6 @@
 <?php
 
 require 'controladores/usuarios.php';
-require 'controladores/contactos.php';
 require 'vistas/VistaXML.php';
 require 'vistas/VistaJson.php';
 require 'utilidades/ExceptionApi.php';

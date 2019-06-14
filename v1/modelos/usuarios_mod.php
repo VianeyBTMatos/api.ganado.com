@@ -1,13 +1,19 @@
+    
 <?php
 class usuarios
 {
     // Datos de la tabla "usuario"
     const NOMBRE_TABLA = "usuario";
     const ID_USUARIO = "idUsuario";
+    const USER = "user";
+    const CONTRASENA = "password";
     const NOMBRE = "nombre";
-    const CONTRASENA = "contrasena";
+    const APELLIDO = "apellido";
     const CORREO = "correo";
+    const TELEFONO = "telefono";
     const CLAVE_API = "claveApi";
+    const idTrabajador = "idTrabajador";
+
     const ESTADO_CREACION_EXITOSA = "Creación exitosa";
     const ESTADO_URL_INCORRECTA = "Ruta incorrecta";
     const ESTADO_CREACION_FALLIDA = "Creación fallida";
@@ -15,7 +21,7 @@ class usuarios
     const ESTADO_ERROR_BD = "Error de Base de Datos";
     
     public static function post($peticion) {
-        if ($peticion[0] == 'registro') {
+        if ($peticion[0] == 'registro') {            
             return self::registrar();
         } else if ($peticion[0] == 'login') {
             return self::loguear();
@@ -26,7 +32,7 @@ class usuarios
    
     private function registrar() {
         $cuerpo = file_get_contents('php://input');
-        $usuario = json_decode($cuerpo);
+        $usuario = json_decode($cuerpo);        
         $resultado = self::crear($usuario);
 
         switch ($resultado) {
@@ -47,12 +53,15 @@ class usuarios
     }
 
     private function crear($datosUsuario) {
+        $user = $datosUsuario->user;
+        $password_user = $datosUsuario->password;
+        $contrasenaEncriptada = self::encriptarContrasena($password_user);
         $nombre = $datosUsuario->nombre;
-
-        $contrasena = $datosUsuario->contrasena;
-        $contrasenaEncriptada = self::encriptarContrasena($contrasena);
-        $correo = $datosUsuario->correo;
+        $apellido = $datosUsuario->apellido;
+        $correo_user = $datosUsuario->correo;
+        $telefono = $datosUsuario->telefono;
         $claveApi = self::generarClaveApi();
+        $id_trabajador = $datosUsuario->idTrabajador;
 
         try {
 
@@ -60,18 +69,26 @@ class usuarios
 
             // Sentencia INSERT
             $comando = "INSERT INTO " . self::NOMBRE_TABLA . " ( " .
-                self::NOMBRE . "," .
+
+                self::USER . "," .
                 self::CONTRASENA . "," .
+                self::NOMBRE . "," .
+                self::APELLIDO . "," .
+                self::CORREO . "," .
+                self::TELEFONO . "," .
                 self::CLAVE_API . "," .
-                self::CORREO . ")" .
-                " VALUES(?,?,?,?)";
+                self::idTrabajador . ")" .
+                " VALUES(?,?,?,?,?,?,?,?)";
 
             $sentencia = $pdo->prepare($comando);
-
-            $sentencia->bindParam(1, $nombre);
+            $sentencia->bindParam(1, $user);
             $sentencia->bindParam(2, $contrasenaEncriptada);
-            $sentencia->bindParam(3, $claveApi);
-            $sentencia->bindParam(4, $correo);
+            $sentencia->bindParam(3, $nombre);
+            $sentencia->bindParam(4, $apellido);
+            $sentencia->bindParam(5, $correo_user);
+            $sentencia->bindParam(6, $telefono);
+            $sentencia->bindParam(7, $claveApi);
+            $sentencia->bindParam(8, $idTrabajador);
 
             $resultado = $sentencia->execute();
 
