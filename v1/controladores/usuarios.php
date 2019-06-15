@@ -26,6 +26,22 @@ class usuarios
     const ESTADO_PARAMETROS_INCORRECTOS = 8;
     //header('Access-Control-Allow-Origin: http://localhost/wservice/consumeWS.html', false);
 
+    public static function get($peticion)
+    {
+       
+        //consulta si el usuario tiene una clave de poder hacer cambios
+        //$idUsuario = usuarios::autorizar();
+    
+        //si la variable peticion esta vacia
+        if (empty($peticion[0]))
+        {
+            return self::obtenerIdUsuario($peticion[0]);
+        }
+        else
+            return self::obtenerIdUsuario($peticion[0]);
+
+    }
+
     public static function post($peticion)
     {
         if ($peticion[0] == 'registro') {
@@ -36,6 +52,52 @@ class usuarios
             throw new ExcepcionApi(self::ESTADO_URL_INCORRECTA, "Url mal formada", 400);
         }
     }
+
+    public static function delete($peticion) //------------------delete
+    {
+        //$idUsuario = usuarios::autorizar();
+        
+        if (!empty($peticion[0])) {
+            if (self::eliminar($peticion[0]) > 0) {
+                http_response_code(200);
+                return [
+                    "estado" => self::CODIGO_EXITO,
+                    "mensaje" => "Registro eliminado correctamente"
+                ];
+            } else {
+                throw new ExcepcionApi(self::ESTADO_NO_ENCONTRADO,
+                    "El contacto al que intentas acceder no existe", 404);
+            }
+        } else {
+            throw new ExcepcionApi(self::ESTADO_ERROR_PARAMETROS, "Falta id", 422);
+        }
+
+    }
+    public static function put($peticion)  //------------------put
+    {
+        //$idUsuario = usuarios::autorizar();   
+        $body = file_get_contents('php://input');
+        $usuario = json_decode($body);
+             
+        if (!empty($peticion[0])) {
+            //$body = file_get_contents('php://input');
+            //$usuario = json_decode($body);
+            
+            if (self::actualizar($usuario, $peticion[0]) > 0) {
+                http_response_code(200);
+                return [
+                    "estado" => self::CODIGO_EXITO,
+                    "mensaje" => "Registro actualizado correctamente"
+                ];
+            } else {
+                throw new ExcepcionApi(self::ESTADO_NO_ENCONTRADO,
+                    "El producto al que intentas acceder no existe", 404);
+            }
+        } else {
+            throw new ExcepcionApi(self::ESTADO_ERROR_PARAMETROS, "Falta id", 422);
+        }
+    }
+
 
 
     /**
@@ -123,6 +185,64 @@ class usuarios
         }
 
     }
+    private function actualizar($usuario, $idUsuario)
+    {        
+        try {
+            
+            // Creando consulta UPDATE
+            $consulta = "UPDATE " . self::NOMBRE_TABLA .
+                " SET " .
+                self::USER . "=?," .
+                self::CONTRASENA . "=?," .
+                self::NOMBRE . "=?," .
+                self::APELLIDO . "=?," .
+                self::CORREO . "=?," .
+                self::TELEFONO . "=?," .
+                self::idTrabajador . "=?" .
+                " WHERE " . self::ID_USUARIO . "=?";                                
+            // Preparar la sentencia
+            $sentencia = ConexionBD::obtenerInstancia()->obtenerBD()->prepare($consulta);
+            $sentencia->bindParam(1, $usuario->user);
+            $sentencia->bindParam(2, $usuario->contrasena);
+            $sentencia->bindParam(3, $usuario->nombre);
+            $sentencia->bindParam(4, $usuario->apellido);
+            $sentencia->bindParam(5, $usuario->correo);
+            $sentencia->bindParam(6, $usuario->telefono);
+            $sentencia->bindParam(7, $usuario->id_trabajador);
+            $sentencia->bindParam(8, $idUsuario);
+            
+
+
+            // Ejecutar la sentencia
+            $sentencia->execute();
+
+            return $sentencia->rowCount();
+            
+
+        } catch (PDOException $e) {
+            throw new ExcepcionApi(self::ESTADO_ERROR_BD, $e->getMessage());
+        }
+    }
+    private function eliminar($id_tipo)
+    {
+        try {
+            
+            // Sentencia DELETE
+           $comando = "DELETE FROM " . self::NOMBRE_TABLA .
+                " WHERE " . self::ID_USUARIO . "=? ";
+
+            // Preparar la sentencia
+            $sentencia = ConexionBD::obtenerInstancia()->obtenerBD()->prepare($comando);
+
+            $sentencia->bindParam(1, $id_tipo);
+
+            $sentencia->execute();
+            return $sentencia->rowCount();            
+
+        } catch (PDOException $e) { 
+            throw new ExcepcionApi(self::ESTADO_ERROR_BD, $e->getMessage());
+        }
+    }
 
     /**
      * Protege la contrase�a con un algoritmo de encriptado
@@ -149,6 +269,7 @@ class usuarios
         $usuario = json_decode($body);
         $correo = $usuario->correo;
         $contrasena = $usuario->contrasena;
+
         if (self::autenticar($correo, $contrasena)){
             $usuarioBD = self::obtenerUsuarioPorCorreo($correo);
             if($usuarioBD != NULL){
@@ -178,27 +299,26 @@ class usuarios
 
         //$comando = "SELECT usuario.password FROM " . self::NOMBRE_TABLA . " WHERE " . self::CORREO . "=?";
         $comando = "SELECT ". self::NOMBRE_TABLA . ".password FROM " . self::NOMBRE_TABLA . " WHERE " . self::CORREO . "=" . "'" . $correo . "'";
-        
-        try{
-            $sentencia = ConexionBD::obtenerInstancia()->obtenerBD()->prepare($comando);
-            $sentencia->bindParam(1, $correo);
-            $sentencia->execute();
-            return $comando;
+         try{
+             $sentencia = ConexionBD::obtenerInstancia()->obtenerBD()->prepare($comando);
+             $sentencia->bindParam(1, $correo);
+             $sentencia->execute();
+            // return $comando;
             
-            if ($sentencia){
-                $resultado = $sentencia->fetch();
+             if ($sentencia){
+                 $resultado = $sentencia->fetch();
                                 
-                if(self::validarContrasena($contrasena, $resultado["password"])){
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        } catch (PDOException $e){
-            throw new ExcepcionApi(self::ESTADO_ERROR_BD, $e->getMessage());
-        }
+                 if(self::validarContrasena($contrasena, $resultado["password"])){
+                     return true;
+                 } else {
+                     return false;
+                 }
+             } else {
+                 return false;
+             }
+         } catch (PDOException $e){
+             throw new ExcepcionApi(self::ESTADO_ERROR_BD, $e->getMessage());
+         }
     }
 
     private function validarContrasena($contrasenaPlana, $contrasenaHash)
@@ -217,18 +337,17 @@ class usuarios
             self::CORREO . ",".
             self::TELEFONO . ",".
             self::CLAVE_API . ",".
-            self::idTrabajador . ",".
+            self::idTrabajador . "".
             " FROM " . self::NOMBRE_TABLA .
-            " WHERE " . self::CORREO . "=?";
+            " WHERE " . self::CORREO . "= ?" ;
+         $sentencia = ConexionBD::obtenerInstancia()->obtenerBD()->prepare($comando);
+         $sentencia->bindParam(1, $correo);
 
-        $sentencia = ConexionBD::obtenerInstancia()->obtenerBD()->prepare($comando);
-        $sentencia->bindParam(1, $correo);
-
-        if ($sentencia->execute()){
-            return $sentencia->fetch(PDO::FETCH_ASSOC);
-        } else {
-            return null;
-        }
+         if ($sentencia->execute()){
+             return $sentencia->fetch(PDO::FETCH_ASSOC);
+         } else {
+             return null;
+         }
     }
 
     /**
@@ -281,18 +400,20 @@ class usuarios
      * @return null si este no fue encontrado
      */
 
-    private function obtenerIdUsuario($claveApi)
+    private function obtenerIdUsuario($idUsuario)
     {
-        $comando = "SELECT " . self::ID_USUARIO .
+        
+        $comando = "SELECT " . self::NOMBRE .
             " FROM " . self::NOMBRE_TABLA .
-            " WHERE " . self::CLAVE_API . "=?";
-
+            " WHERE " . self::ID_USUARIO . "=?";            
+            
             $sentencia = ConexionBD::obtenerInstancia()->obtenerBD()->prepare($comando);
-            $sentencia->bindParam(1, $claveApi);
-
+            $sentencia->bindParam(1, $idUsuario);
+            
             if($sentencia->execute()){
-                $resultado = $sentencia->fetch();
-                return $resultado['idUsuario'];
+                $resultado = $sentencia->fetch();            
+                return $resultado;
+                
             }else {
                 return null;
             }

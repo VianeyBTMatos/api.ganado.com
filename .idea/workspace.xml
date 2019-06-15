@@ -13,8 +13,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/v1/datos/ConexionBD.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
+            <state relative-caret-position="289">
+              <caret line="20" column="24" lean-forward="true" selection-start-line="20" selection-start-column="24" selection-end-line="20" selection-end-column="24" />
             </state>
           </provider>
         </entry>
@@ -193,7 +193,7 @@
       <workItem from="1559255951872" duration="1998000" />
       <workItem from="1559262628517" duration="176000" />
       <workItem from="1560542289121" duration="621000" />
-      <workItem from="1560543638135" duration="241000" />
+      <workItem from="1560543638135" duration="976000" />
     </task>
     <task id="LOCAL-00001" summary="ganado">
       <created>1560543716562</created>
@@ -209,15 +209,28 @@
       <option name="project" value="LOCAL" />
       <updated>1560543834883</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="otra ganado">
+      <created>1560543982232</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1560543982232</updated>
+    </task>
+    <task id="LOCAL-00004" summary="otra ganado">
+      <created>1560544014809</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1560544014809</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="10824000" />
+    <option name="totallyTimeSpent" value="11559000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.16414523" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -273,8 +286,8 @@
     <entry file="file://$PROJECT_DIR$/v1/controladores/contactos.php" />
     <entry file="file://$PROJECT_DIR$/v1/datos/ConexionBD.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
+        <state relative-caret-position="289">
+          <caret line="20" column="24" lean-forward="true" selection-start-line="20" selection-start-column="24" selection-end-line="20" selection-end-column="24" />
         </state>
       </provider>
     </entry>
